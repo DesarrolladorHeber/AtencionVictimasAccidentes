@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * @package Fabilu
+ * @version 1.0
+ * @copyright (C) 2018
+ * @author Steven Garcia
+ */
+
 class AtencionVictimasAccidentesSQL extends ConexionBD
 {
     /*

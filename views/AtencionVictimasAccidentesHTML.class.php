@@ -1,8 +1,12 @@
 <?php
 
 /**
- *
+ * @package Fabilu
+ * @version 1.0
+ * @copyright (C) 2018
+ * @author Steven Garcia
  */
+
 class AtencionVictimasAccidentesHTML
 {
 
@@ -334,9 +338,9 @@ class AtencionVictimasAccidentesHTML
                 // $html .= $mostrar;
                 // $nombreFuncion = $rpt->GetJavaFunction();
 
-                $mostrar = $csv->GetJavacriptReporte('app','AtencionVictimasAccidentes','circular015',array('id_view' => $reporte['id_view'], 'estado' => $reporte['estado'], 'interface'=>1, 'cabecera'=>1, 'nombre'=>'Perros', 'extension' => 'csv', 'xml' => true));
+                $mostrar = $csv->GetJavacriptReporte('app', 'AtencionVictimasAccidentes', 'circular015', array('id_view' => $reporte['id_view'], 'estado' => $reporte['estado'], 'interface' => 1, 'cabecera' => 1, 'nombre' => 'Perros', 'extension' => 'csv', 'xml' => true));
                 $html .= $mostrar;
-                $nombreFuncion = $csv->GetJavaFunction();  
+                $nombreFuncion = $csv->GetJavaFunction();
                 $html .= "        <a href=\"javascript:" . $nombreFuncion . ",location.reload();\" class=\"label_error\">";
                 $html .= "          <img src=\"" . GetThemePath() . "/images/abajo.png\" border=\"0\">\n";
                 $html .= "        </a>\n";

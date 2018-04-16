@@ -1,8 +1,12 @@
 <?php
 
 /**
- *
+ * @package Fabilu
+ * @version 1.0
+ * @copyright (C) 2018
+ * @author Steven Garcia
  */
+
 function MostrarInformacion($datos)
 {
     $objResponse = new xajaxResponse();
@@ -72,5 +76,3 @@ function EliminarReporteCircular($codigo_reporte)
 
     return $objResponse;
 }
-
-

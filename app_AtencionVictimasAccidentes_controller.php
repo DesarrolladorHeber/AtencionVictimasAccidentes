@@ -32,8 +32,8 @@ class app_AtencionVictimasAccidentes_controller extends classModulo
 
     public function reporte()
     {
-        $request = $_REQUEST;
-        $empresa = UserGetEmpresas(UserGetUID());
+        $request  = $_REQUEST;
+        $empresa  = UserGetEmpresas(UserGetUID());
         $usuario  = UserGetUID();
         $permisos = ModuloGetPermisos("app", "AtencionVictimasAccidentes", $usuario);
 
@@ -43,11 +43,11 @@ class app_AtencionVictimasAccidentes_controller extends classModulo
         $this->SetXajax(array('GenerarReporte', 'EnviarReporte', 'EliminarReporteCircular'), null, 'ISO-8859-1');
 
         $datos = $sql->consultarViewCircular();
-        
+
         // echo "<pre>";
         // print_r($empresa);
         // echo "</pre>";
-        
+
         // echo "<pre>";
         // print_r($permisos[$empresa['01']]);
         // echo "</pre>";
@@ -56,7 +56,7 @@ class app_AtencionVictimasAccidentes_controller extends classModulo
 
         $action['volver']         = ModuloGetURL('system', 'Menu');
         $action['detalleReporte'] = ModuloGetURL('app', 'AtencionVictimasAccidentes', 'controller', 'DetalleReporte');
-        $this->salida = $Obj_Menu->CrearReportes($action, $request, $reportes, $datos, $permisos);
+        $this->salida             = $Obj_Menu->CrearReportes($action, $request, $reportes, $datos, $permisos);
         return true;
     }
 
@@ -74,7 +74,7 @@ class app_AtencionVictimasAccidentes_controller extends classModulo
         // echo "<pre>";
         // print_r($request);
         // echo "</pre>";
-        $datos   = $sql->ConsultarReporteCircular($request);
+        $datos = $sql->ConsultarReporteCircular($request);
 
         // echo "<pre>";
         // print_r($datos);
@@ -82,7 +82,7 @@ class app_AtencionVictimasAccidentes_controller extends classModulo
 
         $action['volver']    = ModuloGetURL('app', 'AtencionVictimasAccidentes', 'controller', 'reporte');
         $action['paginador'] = ModuloGetURL('app', 'AtencionVictimasAccidentes', 'controller', 'DetalleReporte', array(
-            'id_view' => $request['id_view'] )
+            'id_view' => $request['id_view'])
         );
 
         $this->salida .= $html->DetalladoCircular($action, $datos, $sql->conteo, $sql->pagina);
@@ -176,10 +176,10 @@ class app_AtencionVictimasAccidentes_controller extends classModulo
 
         $request = $_REQUEST;
 
-        $sql    = AutoCarga::factory("AtencionVictimasAccidentesSQL", "classes", "app", "AtencionVictimasAccidentes");
-        $datos1 = $sql->empresa();
-        $envio  = $sql->ActualizarEnvioAccidente($request['radicado_id']);
-        $datos2 = $sql->datosAccidente($request['radicado_id']);
+        $sql                     = AutoCarga::factory("AtencionVictimasAccidentesSQL", "classes", "app", "AtencionVictimasAccidentes");
+        $datos1                  = $sql->empresa();
+        $envio                   = $sql->ActualizarEnvioAccidente($request['radicado_id']);
+        $datos2                  = $sql->datosAccidente($request['radicado_id']);
         $correos_institucionales = $sql->consultarCorreosInstitucionales();
 
         $mail = AutoCarga::factory("Mail");
@@ -187,14 +187,14 @@ class app_AtencionVictimasAccidentes_controller extends classModulo
         $email_envia  = "fabilu.clinicacolombia@gmail.com";
         $email_nombre = "Fabilu - Clinica Colombia.";
 
-        $email_eps      = $datos2[0]['correo_eps'];
-        $email_arl      = $datos2[0]['correo_arl'];
+        $email_eps = $datos2[0]['correo_eps'];
+        $email_arl = $datos2[0]['correo_arl'];
 
         foreach ($correos_institucionales as $key => $correo) {
             $correoEnvio = $correo['correo'];
             $mail->SetDestinatarios($correoEnvio);
         }
-        
+
         $mail->SetDestinatarios($email_arl);
         $mail->SetDestinatarios($email_eps);
         // $mail->SetDestinatarios($email_clinica);
