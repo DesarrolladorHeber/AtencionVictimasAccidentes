@@ -1,15 +1,14 @@
 <?php
 
 /**
- *
+ * @package Fabilu
+ * @version 1.0
+ * @copyright (C) 2018
+ * @author Steven Garcia
  */
 
 class app_AtencionVictimasAccidentes_controller extends classModulo
 {
-
-    /**
-     *
-     */
     public function main()
     {
         $request = $_REQUEST;
@@ -181,6 +180,7 @@ class app_AtencionVictimasAccidentes_controller extends classModulo
         $datos1 = $sql->empresa();
         $envio  = $sql->ActualizarEnvioAccidente($request['radicado_id']);
         $datos2 = $sql->datosAccidente($request['radicado_id']);
+        $correos_institucionales = $sql->consultarCorreosInstitucionales();
 
         $mail = AutoCarga::factory("Mail");
 
@@ -189,13 +189,16 @@ class app_AtencionVictimasAccidentes_controller extends classModulo
 
         $email_eps      = $datos2[0]['correo_eps'];
         $email_arl      = $datos2[0]['correo_arl'];
-        $email_clinica  = 'lideradmisiones@clinicacolombiaes.com';
-        $email_clinica2 = 'notificaciones_soat2@clinicacolombiaes.com';
 
+        foreach ($correos_institucionales as $key => $correo) {
+            $correoEnvio = $correo['correo'];
+            $mail->SetDestinatarios($correoEnvio);
+        }
+        
         $mail->SetDestinatarios($email_arl);
         $mail->SetDestinatarios($email_eps);
-        $mail->SetDestinatarios($email_clinica);
-        $mail->SetDestinatarios($email_clinica2);
+        // $mail->SetDestinatarios($email_clinica);
+        // $mail->SetDestinatarios($email_clinica2);
         $mail->SetDestinatariosCC($email_envia, $email_nombre);
 
         $mail->SetRemitente($email_envia, $email_nombre);

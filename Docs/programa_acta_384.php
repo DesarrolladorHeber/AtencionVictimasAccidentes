@@ -18,8 +18,8 @@ $cxn = new ConexionBD();
 
 $sql .= "CREATE TABLE correos_envio_reporte_victimas (
         correo_id integer NOT NULL,
-        descripcion character(40),
-        correo character(40)
+        descripcion character varying(100),
+        correo  character varying(100)
         );
 
         COMMENT ON TABLE correos_envio_reporte_victimas IS 'Correos institucionales para el envio del reporte de victimas';
@@ -47,7 +47,7 @@ $sql .= "CREATE TABLE correos_envio_reporte_victimas (
                                   'Correo institucional.'; ";
 
 if (!$rst = $cxn->ConexionBaseDatos($sql)) {
-    echo "Error al crear tabla correos_envio_reporte_victimas: " . $cxn->mensajeDeError;
+    echo "ERROR AL CREAR LA TABLA correos_envio_reporte_victimas: " . $cxn->mensajeDeError;
     exit;
 }
 

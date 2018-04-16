@@ -476,7 +476,7 @@ class AtencionVictimasAccidentesSQL extends ConexionBD
     {
         // $this->debug = true;
 
-        $sql  = " SELECT valor ";
+        $sql = " SELECT valor ";
         $sql .= " FROM system_modulos_variables ";
         $sql .= " WHERE variable = 'id_FIDUFOSYGA' AND ";
         $sql .= "       modulo = '' ";
@@ -487,7 +487,7 @@ class AtencionVictimasAccidentesSQL extends ConexionBD
 
         $id_FIDUFOSYGA = $rst->fields[0];
 
-        $sql  = " SELECT valor ";
+        $sql = " SELECT valor ";
         $sql .= " FROM system_modulos_variables ";
         $sql .= " WHERE variable = 'id_FIDUFOSYGA_ADRES' AND ";
         $sql .= "       modulo = '' ";
@@ -498,24 +498,23 @@ class AtencionVictimasAccidentesSQL extends ConexionBD
 
         $id_FIDUFOSYGA_ADRES = $rst->fields[0];
 
-
         $fecha_inicial = str_replace("/", "", $form['fecha_inicial']);
         $fecha_final   = str_replace("/", "", $form['fecha_final']);
 
         $nombreView = "matview.view_circular_" . $fecha_inicial . "_" . $fecha_final . "";
 
-        $sql  = " create materialized view " . $nombreView . " AS ";
-        $sql .= " SELECT  CASE  WHEN pz.tercero_id = '" . $id_FIDUFOSYGA . "' OR 
-                                     pz.tercero_id = '" . $id_FIDUFOSYGA_ADRES . "' 
+        $sql = " create materialized view " . $nombreView . " AS ";
+        $sql .= " SELECT  CASE  WHEN pz.tercero_id = '" . $id_FIDUFOSYGA . "' OR
+                                     pz.tercero_id = '" . $id_FIDUFOSYGA_ADRES . "'
                                 THEN '0'
                                 ELSE SUBSTRING(REPLACE(pz.poliza,' ',''), 1, 20)
                           END                                                                               AS  idPoliza, ";
-        $sql .= "         CASE WHEN pz.tercero_id = '" . $id_FIDUFOSYGA . "' OR 
-                                     pz.tercero_id = '" . $id_FIDUFOSYGA_ADRES . "' 
+        $sql .= "         CASE WHEN pz.tercero_id = '" . $id_FIDUFOSYGA . "' OR
+                                     pz.tercero_id = '" . $id_FIDUFOSYGA_ADRES . "'
                                THEN '00000000'
-                               WHEN pz.vigencia_hasta IS NULL 
-                               THEN '00000000' 
-                               ELSE TO_CHAR(pz.vigencia_hasta, 'YYYYMMDD') 
+                               WHEN pz.vigencia_hasta IS NULL
+                               THEN '00000000'
+                               ELSE TO_CHAR(pz.vigencia_hasta, 'YYYYMMDD')
                           END                                                                               AS  fechaVencimiento, ";
         $sql .= "         CONCAT  (ev.tipo_id_paciente, ' ', ev.paciente_id)                                AS  idvictima, ";
         $sql .= "         em.codigo_sgsss                                                                   AS  codigoPrestador, ";
@@ -524,43 +523,43 @@ class AtencionVictimasAccidentesSQL extends ConexionBD
                                ELSE TO_CHAR(sa.fecha_accidente, 'YYYYMMDD') END                             AS  fechaSiniestro, ";
         $sql .= "         pz.tercero_id                                                                     AS  idPagador, ";
         $sql .= "         CONCAT  (f.prefijo, ' ', f.factura_fiscal)                                        AS  idFactura, ";
-$sql .= "CASE WHEN f.fecha_registro IS NULL THEN '00000000' ELSE TO_CHAR(f.fecha_registro,'YYYYMMDD') END        AS  fechaFactura,
+        $sql .= "CASE WHEN f.fecha_registro IS NULL THEN '00000000' ELSE TO_CHAR(f.fecha_registro,'YYYYMMDD') END        AS  fechaFactura,
        CASE WHEN e.fecha_radicacion IS NULL THEN '00000000' ELSE TO_CHAR(e.fecha_radicacion, 'YYYYMMDD') END    AS  fechaRadicacion,
 
         CASE WHEN vp.valorPro IS NULL AND  vp2.valorPaquetes > 0 THEN ROUND(vp2.valorPaquetes, 0)
                 WHEN vp.valorPro IS NULL AND  vp2.valorPaquetes IS NULL THEN 0
-                ELSE ROUND((vp.valorPro + CASE WHEN vp2.valorPaquetes IS NULL THEN 0 
-                                               ELSE vp2.valorPaquetes 
-                                          END), 0) 
+                ELSE ROUND((vp.valorPro + CASE WHEN vp2.valorPaquetes IS NULL THEN 0
+                                               ELSE vp2.valorPaquetes
+                                          END), 0)
         END                                                                                                     AS  valorProcedimientos,
 
         CASE WHEN ROUND((f.total_factura-
-                        (CASE WHEN vp2.valorPaquetes IS NULL THEN 0 ELSE vp2.valorPaquetes END 
-                       + CASE WHEN vi.valoInsu  IS NULL THEN 0 ELSE vi.valoInsu  END  
-                       + CASE WHEN vm.valorMed IS NULL THEN 0 ELSE vm.valorMed END 
-                       + CASE WHEN vp.valorPro IS NULL THEN 0 ELSE vp.valorPro END )), 0) > 0  
-               
+                        (CASE WHEN vp2.valorPaquetes IS NULL THEN 0 ELSE vp2.valorPaquetes END
+                       + CASE WHEN vi.valoInsu  IS NULL THEN 0 ELSE vi.valoInsu  END
+                       + CASE WHEN vm.valorMed IS NULL THEN 0 ELSE vm.valorMed END
+                       + CASE WHEN vp.valorPro IS NULL THEN 0 ELSE vp.valorPro END )), 0) > 0
+
              THEN CASE WHEN vi.valoInsu IS NULL THEN 0 ELSE ROUND(vi.valoInsu, 0) END +
                             ROUND((f.total_factura-
-                                     (CASE WHEN vp2.valorPaquetes IS NULL THEN 0 ELSE vp2.valorPaquetes END 
-                                    + CASE WHEN vi.valoInsu  IS NULL THEN 0 ELSE vi.valoInsu  END  
-                                    + CASE WHEN vm.valorMed IS NULL THEN 0 ELSE vm.valorMed END 
+                                     (CASE WHEN vp2.valorPaquetes IS NULL THEN 0 ELSE vp2.valorPaquetes END
+                                    + CASE WHEN vi.valoInsu  IS NULL THEN 0 ELSE vi.valoInsu  END
+                                    + CASE WHEN vm.valorMed IS NULL THEN 0 ELSE vm.valorMed END
                                     + CASE WHEN vp.valorPro IS NULL THEN 0 ELSE vp.valorPro END )), 0)
 
-          
+
              WHEN ROUND((f.total_factura-
-                        (CASE WHEN vp2.valorPaquetes IS NULL THEN 0 ELSE vp2.valorPaquetes END 
-                       + CASE WHEN vi.valoInsu  IS NULL THEN 0 ELSE vi.valoInsu  END  
-                       + CASE WHEN vm.valorMed IS NULL THEN 0 ELSE vm.valorMed END 
-                       + CASE WHEN vp.valorPro IS NULL THEN 0 ELSE vp.valorPro END )), 0) < 0  
-       
+                        (CASE WHEN vp2.valorPaquetes IS NULL THEN 0 ELSE vp2.valorPaquetes END
+                       + CASE WHEN vi.valoInsu  IS NULL THEN 0 ELSE vi.valoInsu  END
+                       + CASE WHEN vm.valorMed IS NULL THEN 0 ELSE vm.valorMed END
+                       + CASE WHEN vp.valorPro IS NULL THEN 0 ELSE vp.valorPro END )), 0) < 0
+
              THEN CASE WHEN vi.valoInsu IS NULL THEN 0 ELSE ROUND(vi.valoInsu, 0) END +
                       ROUND((f.total_factura-
-                             (CASE WHEN vp2.valorPaquetes IS NULL THEN 0 ELSE vp2.valorPaquetes END 
-                            + CASE WHEN vi.valoInsu  IS NULL THEN 0 ELSE vi.valoInsu  END  
-                            + CASE WHEN vm.valorMed IS NULL THEN 0 ELSE vm.valorMed END 
-                            + CASE WHEN vp.valorPro IS NULL THEN 0 ELSE vp.valorPro END )), 0) 
-               
+                             (CASE WHEN vp2.valorPaquetes IS NULL THEN 0 ELSE vp2.valorPaquetes END
+                            + CASE WHEN vi.valoInsu  IS NULL THEN 0 ELSE vi.valoInsu  END
+                            + CASE WHEN vm.valorMed IS NULL THEN 0 ELSE vm.valorMed END
+                            + CASE WHEN vp.valorPro IS NULL THEN 0 ELSE vp.valorPro END )), 0)
+
              ELSE CASE WHEN vi.valoInsu IS NULL THEN 0 ELSE ROUND(vi.valoInsu, 0) END
         END                                                                                                         AS  valorInsumos,
 
@@ -570,12 +569,12 @@ $sql .= "CASE WHEN f.fecha_registro IS NULL THEN '00000000' ELSE TO_CHAR(f.fecha
           CASE WHEN vm.valorMed IS NULL THEN 0 ELSE ROUND(vm.valorMed, 0) END                                       AS  valorMedicamentos,
           0                                                                                                         AS  valorOtros,
           CASE WHEN f.total_factura IS NULL THEN 0 ELSE ROUND(f.total_factura, 0) END                               AS  valorFactura ";
-        
+
         $sql .= " FROM fac_facturas    AS  f ";
         $sql .= "   JOIN    fac_facturas_cuentas    AS  fc  ON  ( f.prefijo = fc.prefijo AND ";
         $sql .= "                                                 f.factura_fiscal = fc.factura_fiscal ) ";
         $sql .= "   JOIN    envios_detalle          AS  ed  ON  ( ed.prefijo = f.prefijo AND ";
-        $sql .= "                                                 ed.factura_fiscal = f.factura_fiscal ) "; 
+        $sql .= "                                                 ed.factura_fiscal = f.factura_fiscal ) ";
         $sql .= "   JOIN    cuentas                 AS  c   ON  ( c.numerodecuenta = fc.numerodecuenta ) ";
         $sql .= "   JOIN    ingresos                AS  i   ON  ( i.ingreso = c.ingreso ) ";
         $sql .= "   JOIN    ingresos_soat           AS  ins ON  ( i.ingreso = ins.ingreso ) ";
@@ -583,11 +582,11 @@ $sql .= "CASE WHEN f.fecha_registro IS NULL THEN '00000000' ELSE TO_CHAR(f.fecha
         $sql .= "   JOIN    planes                  AS  pl  ON  ( pl.plan_id = f.plan_id ) ";
         $sql .= "   JOIN    soat_polizas            AS  pz  ON  ( pz.poliza  = ev.poliza AND ";
         $sql .= "                                                 pz.tercero_id = pl.tercero_id AND ";
-        $sql .= "                                                 pz.tipo_id_tercero = pl.tipo_tercero_id) "; 
+        $sql .= "                                                 pz.tipo_id_tercero = pl.tipo_tercero_id) ";
         $sql .= "   JOIN    envios                  AS  e   ON  ( ed.envio_id = e.envio_id ) ";
         $sql .= "   LEFT JOIN    soat_accidente     AS  sa  ON  ( ev.accidente_id = sa.accidente_id) ";
         $sql .= "   LEFT JOIN    empresas           AS  em  ON  ( ev.empresa_id   = em.empresa_id ) ";
-        $sql .= "   LEFT JOIN  (SELECT numerodecuenta, "; 
+        $sql .= "   LEFT JOIN  (SELECT numerodecuenta, ";
         $sql .= "                       SUM(valor_cubierto) AS  valorPro ";
         $sql .= "               FROM    cuentas_detalle AS  ed ";
         $sql .= "               WHERE   facturado = '1' ";
@@ -601,27 +600,27 @@ $sql .= "CASE WHEN f.fecha_registro IS NULL THEN '00000000' ELSE TO_CHAR(f.fecha
         $sql .= "               WHERE    cd.paquete_codigo_id IS NOT NULL";
         $sql .= "                   AND  cargo_cups IS NOT NULL";
         $sql .= "                   AND  cd.sw_paquete_facturado = '1'";
-        $sql .= "                   AND  facturado = '1'"; 
+        $sql .= "                   AND  facturado = '1'";
         $sql .= "               GROUP BY numerodecuenta) AS vp2 ON (c.numerodecuenta = vp2.numerodecuenta)";
 
-        $sql .= "   LEFT JOIN  (SELECT  numerodecuenta, "; 
+        $sql .= "   LEFT JOIN  (SELECT  numerodecuenta, ";
         $sql .= "                       SUM(cd.valor_cubierto) AS  valorMed ";
         $sql .= "               FROM    cuentas_detalle cd ";
         $sql .= "                   JOIN    bodegas_documentos_d    AS bd    ON  (cd.consecutivo = bd.consecutivo) ";
         $sql .= "                   JOIN    inventarios_productos   AS inv   ON  (bd.codigo_producto = inv.codigo_producto) ";
-        $sql .= "                   JOIN    inv_grupos_inventarios  AS gi    ON  (gi.grupo_id = inv.grupo_id) ";   
+        $sql .= "                   JOIN    inv_grupos_inventarios  AS gi    ON  (gi.grupo_id = inv.grupo_id) ";
         $sql .= "              WHERE   bd.consecutivo IS NOT NULL ";
         $sql .= "                   AND     cd.paquete_codigo_id IS NULL ";
         $sql .= "                   AND     facturado = '1' ";
         $sql .= "                   AND     sw_medicamento = '1' ";
         $sql .= "               GROUP BY numerodecuenta) AS vm   ON  (c.numerodecuenta = vm.numerodecuenta) ";
 
-        $sql .= "   LEFT JOIN  (SELECT  numerodecuenta, "; 
+        $sql .= "   LEFT JOIN  (SELECT  numerodecuenta, ";
         $sql .= "                       SUM(cd.valor_cubierto) AS  valoInsu ";
         $sql .= "               FROM    cuentas_detalle cd ";
         $sql .= "                   JOIN    bodegas_documentos_d    AS bd    ON  (cd.consecutivo = bd.consecutivo) ";
         $sql .= "                   JOIN    inventarios_productos   AS inv   ON  (bd.codigo_producto = inv.codigo_producto) ";
-        $sql .= "                   JOIN    inv_grupos_inventarios  AS gi    ON  (gi.grupo_id = inv.grupo_id) ";   
+        $sql .= "                   JOIN    inv_grupos_inventarios  AS gi    ON  (gi.grupo_id = inv.grupo_id) ";
         $sql .= "               WHERE   bd.consecutivo IS NOT NULL ";
         $sql .= "                   AND cd.paquete_codigo_id IS NULL ";
         $sql .= "                   AND facturado = '1' ";
@@ -632,7 +631,7 @@ $sql .= "CASE WHEN f.fecha_registro IS NULL THEN '00000000' ELSE TO_CHAR(f.fecha
         $sql .= "   AND   pl.tipo_cliente = '20' ";
         $sql .= "   AND   f.estado    IN  ('0', '1') ";
         $sql .= "   AND   e.sw_estado   IN  ('0', '1', '3') ";
-        $sql .= "   AND   e.fecha_radicacion::DATE >= f.fecha_registro::DATE "; 
+        $sql .= "   AND   e.fecha_radicacion::DATE >= f.fecha_registro::DATE ";
         $sql .= "   AND   sa.fecha_accidente::DATE <= pz.vigencia_hasta::DATE ";
         $sql .= "   AND   f.fecha_registro::DATE >= sa.fecha_accidente::DATE ";
 
@@ -683,13 +682,13 @@ $sql .= "CASE WHEN f.fecha_registro IS NULL THEN '00000000' ELSE TO_CHAR(f.fecha
 
         $nombreView = $rst->fields[0];
 
-        $sql = " drop materialized view ".$nombreView." ";
+        $sql = " drop materialized view " . $nombreView . " ";
 
         if (!$rst = $this->ConexionBaseDatos($sql)) {
             return false;
         }
 
-        $sql  = " UPDATE views_cirucular_015 ";
+        $sql = " UPDATE views_cirucular_015 ";
         $sql .= " SET    fecha_eliminacion = NOW(), ";
         $sql .= "        id_usuario_eliminar = " . UserGetUID() . " ";
         $sql .= " WHERE  id_view  = '" . $codigo_reporte . "' ";
@@ -714,13 +713,13 @@ $sql .= "CASE WHEN f.fecha_registro IS NULL THEN '00000000' ELSE TO_CHAR(f.fecha
 
         $nombreView = $rst->fields[0];
 
-        $sql = "SELECT * FROM ".trim($nombreView)." ";
+        $sql = "SELECT * FROM " . trim($nombreView) . " ";
         if ($request[id_documento] != '' || $request[mes_registro] != '') {
             $request['offset'] = 0;
             $sql .= " WHERE ";
             if ($request[id_documento] != '') {
                 $sql .= " idvictima LIKE '%" . $request['id_documento'] . "%' ";
-            }elseif ($request[mes_registro] != '') {
+            } elseif ($request[mes_registro] != '') {
                 $sql .= " EXTRACT(MONTH FROM CAST(fecharadicacion AS DATE))::INTEGER = '" . $request['mes_registro'] . "' ";
             }
         }
@@ -747,5 +746,27 @@ $sql .= "CASE WHEN f.fecha_registro IS NULL THEN '00000000' ELSE TO_CHAR(f.fecha
         return $datos;
     }
 
+    public function consultarCorreosInstitucionales()
+    {
+        // $this->debug = true;
+
+        $sql = "SELECT * FROM correos_envio_reporte_victimas ";
+
+        if (!$rst = $this->ConexionBaseDatos($sql)) {
+            return false;
+        }
+
+        $datos = array();
+        while (!$rst->EOF) {
+            $datos[] = $rst->GetRowAssoc($ToUpper = false);
+            $rst->MoveNext();
+        }
+        // echo "<pre>";
+        // print_r($datos);
+        // echo "</pre>";
+        $rst->Close();
+
+        return $datos;
+    }
 
 };
